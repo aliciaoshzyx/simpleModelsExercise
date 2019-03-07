@@ -61,7 +61,7 @@ const readDog = (req, res) => {
     }
     return res.json(doc);
   };
-  Cat.findByName(name1, callback);
+  Dog.findByName(name1, callback);
 };
 
 const hostPage1 = (req, res) => {
