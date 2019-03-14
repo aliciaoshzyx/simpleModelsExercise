@@ -101,7 +101,7 @@ const getName = (req, res) => {
 };
 
 const getDogName = (req, res) => {
-  res.json({ name: lastDog.name });
+  res.render({ name: lastDog.name });
 };
 
 const setName = (req, res) => {
@@ -129,18 +129,18 @@ const setName = (req, res) => {
     // This way we can update it dynamically
     lastAdded = newCat;
     // return success
-    res.json({ name: lastAdded.name, beds: lastAdded.bedsOwned });
+    res.render({ name: lastAdded.name, beds: lastAdded.bedsOwned });
   });
 
   // if error, return it
-  savePromise.catch(err => res.json({ err }));
+  savePromise.catch(err => res.render({ err }));
 
   return res;
 };
 
 const setDog = (req, res) => {
   if (!req.body.name || !req.body.breed || !req.body.age) {
-    return res.status(400).json({ error: 'name, breed and beds are all required' });
+    return res.status(400).render({ error: 'name, breed and beds are all required' });
   }
 
   const dogData = {
@@ -155,12 +155,35 @@ const setDog = (req, res) => {
 
   savePromise.then(() => {
     lastDog = newDog;
-    res.json({ name: lastDog.name, breed: lastDog.breed, age: lastDog.age });
+    res.render({ name: lastDog.name, breed: lastDog.breed, age: lastDog.age });
   });
 
-  savePromise.catch(err => res.json({ err }));
+  savePromise.catch(err => res.render({ err }));
 
   return res;
+};
+const updateLast = (req, res) => {
+  lastAdded.bedsOwned++;
+
+  const savePromise = lastAdded.save();
+
+  // send back the name as a success for now
+  savePromise.then(() => res.render({ name: lastAdded.name, beds: lastAdded.bedsOwned }));
+
+  // if save error, just return an error for now
+  savePromise.catch(err => res.render({ err }));
+};
+
+const updateLastDog = (req, res) => {
+  lastDog.age++;
+
+  const savePromise = lastDog.save();
+
+  // send back the name as a success for now
+  savePromise.then(() => res.render({ name: lastDog.name, breed: lastDog.breed, age: lastDog.age }));
+
+  // if save error, just return an error for now
+  savePromise.catch(err => res.render({ err }));
 };
 
 const searchName = (req, res) => {
@@ -171,17 +194,17 @@ const searchName = (req, res) => {
   return Cat.findByName(req.query.name, (err, doc) => {
     // errs, handle them
     if (err) {
-      return res.json({ err }); // if error, return it
+      return res.render({ err }); // if error, return it
     }
 
     // if no matches, let them know
     // (does not necessarily have to be an error since technically it worked correctly)
     if (!doc) {
-      return res.json({ error: 'No cats found' });
+      return res.render({ error: 'No cats found' });
     }
 
     // if a match, send the match back
-    return res.json({ name: doc.name, beds: doc.bedsOwned });
+    return res.render({ name: doc.name, beds: doc.bedsOwned });
   });
 };
 
@@ -192,37 +215,23 @@ const searchDog = (req, res) => {
 
   return Dog.findByName(req.query.name, (err, doc) => {
     if (err) {
-      return res.json({ err });
+      return res.render({ err }); // if error, return it
     }
 
+    // if no matches, let them know
+    // (does not necessarily have to be an error since technically it worked correctly)
     if (!doc) {
-      return res.json({ Error: 'No Dogs found' });
+      return res.json({ error: 'No dogs found' });
     }
+    doc.age++;
+    const savePromise = doc.save();
 
-    return res.json({ name: doc.name, breed: doc.breed, age: doc.age });
+    savePromise.then(() => res.render({ name: doc.name, breed: doc.breed, age: doc.age}));
+
+    return res.render({ name: doc.name, breed: doc.breed, age: doc.age});
   });
 };
 
-const updateLast = (req, res) => {
-  lastAdded.bedsOwned++;
-
-  const savePromise = lastAdded.save();
-
-  // send back the name as a success for now
-  savePromise.then(() => res.json({ name: lastAdded.name, beds: lastAdded.bedsOwned }));
-
-  // if save error, just return an error for now
-  savePromise.catch(err => res.json({ err }));
-};
-
-const updateLastDog = (req, res) => {
-  lastDog.age++;
-  const savePromise = lastAdded.save();
-
-  savePromise.then(() => res.json({ name: lastDog.name, breed: lastDog.breed, age: lastDog.age }));
-
-  savePromise.catch(err => res.json({ err }));
-};
 
 const notFound = (req, res) => {
   res.status(404).render('notFound', {
