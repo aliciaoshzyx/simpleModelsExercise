@@ -229,9 +229,9 @@ const searchDog = (req, res) => {
     temp.age++;
     const savePromise = doc.save();
 
-    savePromise.then(() => res.render('page3', { message: `${doc.name} is now ${doc.age} years old` }));
+    savePromise.then(() => res.render({ name: doc.name, breed: doc.breed, age: doc.age }));
 
-    return res.render('page3', { message: `${doc.name} is now ${doc.age} years old` });
+    return res.json({ name: doc.name, breed: doc.breed, age: doc.age });
   });
 };
 
