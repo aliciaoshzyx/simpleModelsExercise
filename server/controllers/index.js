@@ -180,7 +180,9 @@ const updateLastDog = (req, res) => {
   const savePromise = lastDog.save();
 
   // send back the name as a success for now
-  savePromise.then(() => res.render({ name: lastDog.name, breed: lastDog.breed, age: lastDog.age }));
+  savePromise.then(() => res.render({ name: lastDog.name,
+    breed: lastDog.breed,
+    age: lastDog.age }));
 
   // if save error, just return an error for now
   savePromise.catch(err => res.render({ err }));
@@ -223,12 +225,13 @@ const searchDog = (req, res) => {
     if (!doc) {
       return res.json({ error: 'No dogs found' });
     }
-    doc.age++;
+    const temp = doc;
+    temp.age++;
     const savePromise = doc.save();
 
-    savePromise.then(() => res.render({ name: doc.name, breed: doc.breed, age: doc.age}));
+    savePromise.then(() => res.render({ name: doc.name, breed: doc.breed, age: doc.age }));
 
-    return res.render({ name: doc.name, breed: doc.breed, age: doc.age});
+    return res.json({ name: doc.name, breed: doc.breed, age: doc.age });
   });
 };
 
